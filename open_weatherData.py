@@ -2,6 +2,7 @@ from airflow import DAG
 from datetime import timedelta, datetime
 from airflow.providers.http.sensors.http import HttpSensor
 import json
+from airflow.providers.http.operators.http import SimpleHttpOperator
 
 
 
@@ -26,5 +27,15 @@ with DAG('weatherETL',
         weather_api_good = HttpSensor(
         task_id ='weather_api_good',
         http_conn_id='WeatherETL_UAT',
-        endpoint='/data/2.5/weather?q=Pune&appid=a095f3aa0708c6471a104b7388c89e14'
+        endpoint='/data/2.5/weather?q=Pune&appid=a095f3aa0708c6471a104b7388c89e14',
+        poke_interval = 10
+        )
+        
+        get_weather_data = SimpleHttpOperator(
+        task_id = 'get_weather_data',
+        http_conn_id = 'WeatherETL_UAT',
+        endpoint='/data/2.5/weather?q=Pune&appid=a095f3aa0708c6471a104b7388c89e14',
+        method = 'GET',
+        response_filter= lambda r: json.loads(r.text),
+        log_response=True
         )
