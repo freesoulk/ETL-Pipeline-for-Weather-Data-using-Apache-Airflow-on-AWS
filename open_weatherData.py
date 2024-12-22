@@ -5,9 +5,13 @@ import json
 from airflow.providers.http.operators.http import SimpleHttpOperator
 from airflow.operators.python import PythonOperator
 import pandas as pd
+
+
 def kelvin_to_fahrenheit(temp_in_kelvin):
     temp_in_fahrenheit = (temp_in_kelvin - 273.15) * (9/5) + 32
     return temp_in_fahrenheit
+
+
 def transform_and_load_data(task_instance):
     data = task_instance.xcom_pull(task_ids="get_weather_data")
     city = data["name"]
